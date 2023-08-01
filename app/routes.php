@@ -2,16 +2,10 @@
 
 use Framework\Routing\Router;
 
-/**
- * Defines routes and handlers for a PHP router object.
- *
- * @param Router $router The router object to define routes and handlers for.
- * @return Closure The closure function that sets up the routes and handlers.
- */
 return function(Router $router) {
     $router->add(
         'GET', '/',
-        fn() => 'hello world',
+        fn() => view('home', ['number' => 42]),
     );
 
     $router->add(
@@ -37,7 +31,11 @@ return function(Router $router) {
         'GET', '/products/view/{product}',
         function () use ($router) {
             $parameters = $router->current()->parameters();
-            return "product is {$parameters['product']}";
+
+            return view('products/view', [
+                'product' => $parameters['product'],
+                'scary' => '<script>alert("hello")</script>',
+            ]);
         },
     );
 
@@ -51,7 +49,10 @@ return function(Router $router) {
                 'product-list', ['page' => $parameters['page'] + 1]
             );
 
-            return "products for page {$parameters['page']}, next page is {$next}";
+            return view('products/list', [
+                'parameters' => $parameters,
+                'next' => $next,
+            ]);
         },
     )->name('product-list');
 
