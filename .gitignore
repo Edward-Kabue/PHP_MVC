@@ -24,3 +24,4 @@
 
 # Ignore any sensitive or private files (configurations, keys, etc.)
 /config/secret.ini
+/composer.lock

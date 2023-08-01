@@ -2,6 +2,12 @@
 
 use Framework\Routing\Router;
 
+/**
+ * Defines routes and handlers for a PHP router object.
+ *
+ * @param Router $router The router object to define routes and handlers for.
+ * @return Closure The closure function that sets up the routes and handlers.
+ */
 return function(Router $router) {
     $router->add(
         'GET', '/',
