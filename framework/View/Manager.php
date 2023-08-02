@@ -56,6 +56,13 @@ class Manager
         throw new Exception("Could not resolve '{$template}'");
     }
 
+    /**
+     * Adds a macro to the collection.
+     *
+     * @param string $name The name of the macro.
+     * @param Closure $closure The closure of the macro.
+     * @return static
+     */
     public function addMacro(string $name, Closure $closure): static
     {
         $this->macros[$name] = $closure;
