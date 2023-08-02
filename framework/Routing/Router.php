@@ -3,38 +3,18 @@
 namespace Framework\Routing;
 
 use Exception;
+use Framework\Validation\ValidationException;
 use Throwable;
+use Whoops\Handler\PrettyPageHandler;
+use Whoops\Run;
 
-/**
- * The Router class is responsible for routing HTTP requests to the appropriate handler function.
- * It allows for adding routes with specific HTTP methods and paths, as well as error handlers for different HTTP error codes.
- * The class provides methods for dispatching the current request, redirecting to a different path, and generating a path for a named route with optional parameters.
- *
- * Methods:
- * - add(): adds a new route with a specified HTTP method, path, and handler function
- * - errorHandler(): sets a callable function to handle a specific HTTP error code
- * - dispatch(): matches the current request to a route and dispatches it, or returns an error if no matching route is found
- * - paths(): returns an array of paths for all added routes
- * - current(): returns the current matched route, if any
- * - match(): matches a specified HTTP method and path to a route, or returns null if no match is found
- * - dispatchNotAllowed(): returns an error message for a 400 HTTP error code
- * - dispatchNotFound(): returns an error message for a 404 HTTP error code
- * - dispatchError(): returns an error message for a 500 HTTP error code
- * - redirect(): redirects to a specified path with a 301 HTTP status code
- * - route(): generates a path for a named route with optional parameters
- *
- * Fields:
- * - routes: an array of Route objects representing all added routes
- * - errorHandlers: an array of callable functions to handle different HTTP error codes
- * - current: the currently matched Route object, if any
- */
 class Router
 {
     protected array $routes = [];
     protected array $errorHandlers = [];
     protected Route $current;
 
-    public function add(string $method, string $path, callable $handler): Route
+    public function add(string $method, string $path, $handler): Route
     {
         $route = $this->routes[] = new Route($method, $path, $handler);
         return $route;
@@ -61,6 +41,18 @@ class Router
                 return $matching->dispatch();
             }
             catch (Throwable $e) {
+                if ($e instanceof ValidationException) {
+                    $_SESSION['errors'] = $e->getErrors();
+                    return redirect($_SERVER['HTTP_REFERER']);
+                }
+
+                if (isset($_ENV['APP_ENV']) && $_ENV['APP_ENV'] === 'dev') {
+                    $whoops = new Run();
+                    $whoops->pushHandler(new PrettyPageHandler);
+                    $whoops->register();
+                    throw $e;
+                }
+
                 return $this->dispatchError();
             }
         }
@@ -72,11 +64,6 @@ class Router
         return $this->dispatchNotFound();
     }
 
-    /**
-     * Returns an array of paths by iterating over the routes and retrieving the path for each route.
-     *
-     * @return array The array of paths.
-     */
     private function paths(): array
     {
         $paths = [];
