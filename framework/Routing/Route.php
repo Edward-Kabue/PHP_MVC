@@ -10,7 +10,7 @@ class Route
     protected array $parameters = [];
     protected ?string $name = null;
 
-    public function __construct(string $method, string $path, callable $handler)
+    public function __construct(string $method, string $path, $handler)
     {
         $this->method = $method;
         $this->path = $path;

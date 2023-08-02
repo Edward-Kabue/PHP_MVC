@@ -12,7 +12,7 @@
 
 # Ignore environment configuration files
 .env
-.env.*
+
 
 # Ignore IDE and editor-specific files
 .vscode/
@@ -24,3 +24,5 @@
 
 # Ignore any sensitive or private files (configurations, keys, etc.)
 /config/secret.ini
+/composer.lock
+
